@@ -1,6 +1,6 @@
 // @todo: Темплейт карточки 
 
-const cardTamplate = document.querySelector('#card-template').content;
+const cardTemplate = document.querySelector('#card-template').content;
 
 // @todo: DOM узлы
 
@@ -10,11 +10,12 @@ const tamplateContainer = document.querySelector('.places__list');
 
 function createCards(element, deleteCards) {
     
-    const copyTemplate = cardTamplate.querySelector('.places__item').cloneNode(true); 
+    const copyTemplate = cardTemplate.querySelector('.places__item').cloneNode(true); 
+    const cardName = element.name;
     copyTemplate.querySelector('.card__image').src = element.link;       
-    copyTemplate.querySelector('.card__image').alt = element.name;
-    copyTemplate.querySelector('.card__title').textContent = element.name;
-    deleteCards(copyTemplate);
+    copyTemplate.querySelector('.card__image').alt = cardName;
+    copyTemplate.querySelector('.card__title').textContent = cardName;
+    copyTemplate.querySelector('.card__delete-button').addEventListener('click', function() { deleteCards(copyTemplate) });
     return copyTemplate;
 
 }
@@ -31,12 +32,12 @@ function addCards(card) {
 
 function deleteCards(copyTemplate) {
 
-    copyTemplate.querySelector('.card__delete-button').addEventListener('click', function() { copyTemplate.remove() });
+    copyTemplate.remove();
 
 }
 
 initialCards.forEach(element => {
 
     addCards(createCards(element, deleteCards));
-    
+
 });
