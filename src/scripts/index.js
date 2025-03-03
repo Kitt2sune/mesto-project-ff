@@ -1,9 +1,9 @@
-// импорт стилей и карточек
+// импорт модулей
 
 import '../pages/index.css'; 
-import {popupOpen, popupClose} from '../components/modal.js';
+import {openPopup, closePopup, mousedownPopup, escapePopup} from '../components/modal.js';
 import {initialCards} from '../components/cards.js';
-import {cardCreate, cardAdd, cardLike, cardDelete} from '../components/card.js'
+import {createCard, addCard, likeCard, deleteCard} from '../components/card.js'
 
 // Дом-узлы темплейта
 
@@ -16,7 +16,8 @@ const popupEditProfile = document.querySelector('.popup_type_edit');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupCard = document.querySelector('.popup_type_image');
 const popups = document.querySelectorAll('.popup');
-
+const popupCardPicture = document.querySelector('.popup__image');
+const popupCardContent = document.querySelector('.popup__caption');
 
 // Дом-узлы кнопок
 
@@ -39,11 +40,11 @@ const inputLink = formAdd['link'];
 
 // Обработчик добавления новой карточки
 
-formAdd.addEventListener('submit', (evt) => addCardFormSubmit(evt));
+formAdd.addEventListener('submit', (evt) => {addCardFormSubmit(evt)});
 
 // Обработчик добавления новой карточки
 
-buttonNewCard.addEventListener('click', function() { popupOpen(popupNewCard) });
+buttonNewCard.addEventListener('click', () => {openPopup(popupNewCard)});
 
 // Обработчики формы редактирования профиля
 
@@ -51,23 +52,27 @@ buttonEdit.addEventListener('click', () => {
 
   inputJob.value = profileJobInfo.textContent;
   inputName.value = profileNameInfo.textContent;
-  popupOpen(popupEditProfile);
+
+  openPopup(popupEditProfile);
 
 });
 
-formProfile.addEventListener('submit', (evt) => handleFormSubmit(evt));
+formProfile.addEventListener('submit', (evt) => {handleFormSubmit(evt)});
 
 // Добавление ккарточек
 
-initialCards.forEach(element => {cardAdd(cardCreate(element, cardDelete, cardClick, cardLike));});
+initialCards.forEach(element => {addCard(createCard(element, deleteCard, clickCard, likeCard));});
 
 // Функция добавления новой карточки
 
 function addCardFormSubmit(evt) {
 
   evt.preventDefault(); 
-  cardAdd(cardCreate({name: inputtitle.value, link: inputLink.value}, cardDelete, cardClick, cardLike));
-  popupClose(popupNewCard);
+
+  addCard(createCard({name: inputtitle.value, link: inputLink.value}, deleteCard, clickCard, likeCard));
+
+  closePopup(popupNewCard);
+
   formAdd.reset();
 
 }
@@ -76,27 +81,24 @@ function addCardFormSubmit(evt) {
 
 function handleFormSubmit(evt) {
 
-    evt.preventDefault(); 
+  evt.preventDefault(); 
     
-    document.querySelector('.profile__description').textContent = inputJob.value; 
-    document.querySelector('.profile__title').textContent = inputName.value;
+  document.querySelector('.profile__description').textContent = inputJob.value; 
+  document.querySelector('.profile__title').textContent = inputName.value;
    
-    popupClose(popupEditProfile);
+  closePopup(popupEditProfile);
 
 }
 
 // Функция открытие попапа карточки
 
-function cardClick ({name, link}) {
+function clickCard ({name, link}) {
 
-    const cardPicture = document.querySelector('.popup__image');
-    const cardContent = document.querySelector('.popup__caption');
+  popupCardPicture.src = link;
+  popupCardPicture.alt = name;
+  popupCardContent.textContent = name;  
 
-    cardPicture.src = link;
-    cardPicture.alt = name;
-    cardContent.textContent = name;  
-
-    popupOpen(popupCard); 
+  openPopup(popupCard); 
 
 }
 
@@ -104,21 +106,12 @@ function cardClick ({name, link}) {
 
 popups.forEach((popup) => { 
 
-    const buttonClose = popup.querySelector('.popup__close'); 
-
-    buttonClose.addEventListener('click', () => popupClose(popup)); 
-   
-    popup.addEventListener('mousedown', (evt) => { 
-      if (evt.target === evt.currentTarget) { 
-        popupClose(popup); 
-      } 
-    });
-    document.addEventListener('keydown', (evt) => { 
-      if (evt.key === 'Escape') {
-        popupClose(popup); 
-      }
-    }); 
+  popup.querySelector('.popup__close').addEventListener('click', () => {closePopup(popup)}); 
+  popup.addEventListener('mousedown', (evt) => {mousedownPopup(evt, popup)});
+  document.addEventListener('keydown', (evt) => {escapePopup(evt, popup)}); 
 
 });
+
+
 
 export {cardTemplate, tamplateContainer};
