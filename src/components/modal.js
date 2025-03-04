@@ -4,6 +4,7 @@
 function openPopup (popup) {
 
   popup.classList.add('popup_is-opened');
+  document.addEventListener('keydown', (evt) => {escapePopup(evt)}); 
 
 }
 
@@ -12,7 +13,7 @@ function openPopup (popup) {
 function closePopup (popup) {
 
   popup.classList.remove('popup_is-opened');
-  popup.classList.add('popup_is-animated');
+  document.removeEventListener('keydown', (evt) => {escapePopup(evt)})
 
 }
 
@@ -24,12 +25,12 @@ function mousedownPopup (evt, popup) {
 
 }
 
-function escapePopup (evt, popup) {
+function escapePopup (evt) {
 
   if (evt.key === 'Escape') {
-    closePopup(popup); 
+    closePopup(document.querySelector('.popup_is-opened')); 
   }
 
 }
 
-export {openPopup, closePopup, mousedownPopup, escapePopup};
+export {openPopup, closePopup, mousedownPopup};

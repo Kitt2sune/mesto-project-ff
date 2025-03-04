@@ -1,14 +1,13 @@
 // импорт модулей
 
 import '../pages/index.css'; 
-import {openPopup, closePopup, mousedownPopup, escapePopup} from '../components/modal.js';
+import {openPopup, closePopup, mousedownPopup} from '../components/modal.js';
 import {initialCards} from '../components/cards.js';
-import {createCard, addCard, likeCard, deleteCard} from '../components/card.js'
+import {createCard, likeCard, deleteCard} from '../components/card.js'
 
 // Дом-узлы темплейта
 
-const cardTemplate = document.querySelector('#card-template').content;
-const tamplateContainer = document.querySelector('.places__list');
+const templateContainer = document.querySelector('.places__list');
 
 // Дом-узлы попапов
 
@@ -57,11 +56,11 @@ buttonEdit.addEventListener('click', () => {
 
 });
 
-formProfile.addEventListener('submit', (evt) => {handleFormSubmit(evt)});
+formProfile.addEventListener('submit', (evt) => {handleProfileFormSubmit(evt)});
 
 // Добавление ккарточек
 
-initialCards.forEach(element => {addCard(createCard(element, deleteCard, clickCard, likeCard));});
+initialCards.forEach((element) => templateContainer.append(createCard(element, deleteCard, clickCard, likeCard)));
 
 // Функция добавления новой карточки
 
@@ -69,7 +68,7 @@ function addCardFormSubmit(evt) {
 
   evt.preventDefault(); 
 
-  addCard(createCard({name: inputtitle.value, link: inputLink.value}, deleteCard, clickCard, likeCard));
+  templateContainer.prepend(createCard({name: inputtitle.value, link: inputLink.value}, deleteCard, clickCard, likeCard));
 
   closePopup(popupNewCard);
 
@@ -79,7 +78,7 @@ function addCardFormSubmit(evt) {
 
 // Функция изменения профиля
 
-function handleFormSubmit(evt) {
+function handleProfileFormSubmit(evt) {
 
   evt.preventDefault(); 
     
@@ -106,12 +105,8 @@ function clickCard ({name, link}) {
 
 popups.forEach((popup) => { 
 
+  popup.classList.add('popup_is-animated');
   popup.querySelector('.popup__close').addEventListener('click', () => {closePopup(popup)}); 
   popup.addEventListener('mousedown', (evt) => {mousedownPopup(evt, popup)});
-  document.addEventListener('keydown', (evt) => {escapePopup(evt, popup)}); 
 
 });
-
-
-
-export {cardTemplate, tamplateContainer};
