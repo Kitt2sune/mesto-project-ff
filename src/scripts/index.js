@@ -4,7 +4,8 @@ import '../pages/index.css';
 import {openPopup, closePopup, mousedownPopup} from '../components/modal.js';
 import {createCard, likeCard, deleteCard} from '../components/card.js'
 import {clearValidation, enableValidation} from '../components/validation.js';
-import {requestAPI} from '../components/api.js'
+import {requestAPI} from '../components/api.js';
+import {renderLoading} from '../components/utils.js';
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -73,26 +74,16 @@ function setProfile (name, about, avatar) {
   profileImage.style.backgroundImage = `url(${avatar})`;
 }
 
-// Render saving
-
-function renderLoading (button, flag) {
-  button.textContent = flag ? 'Сохранение...' : 'Сохранить';
-}
-
 // Обработчик clickов
 
 profileImage.addEventListener('click', () => { 
 
-  formEditAvatar.reset();
-  clearValidation(formEditAvatar, validationConfig);
   openPopup(popupEditAvatar);
 
 });
 
 buttonNewCard.addEventListener('click', () => {
 
-  formNewCard.reset();
-  clearValidation(formNewCard, validationConfig);
   openPopup(popupNewCard);
   
 });
@@ -111,7 +102,7 @@ buttonEdit.addEventListener('click', () => {
 formEditAvatar.addEventListener('submit', (evt) => {submitAvatarForm(evt)});
 formEditProfile.addEventListener('submit', (evt) => {submitProfileForm(evt)});
 formNewCard.addEventListener('submit', (evt) => {submitAddCardForm(evt)});
-formConfirm.addEventListener('submit', (evt) => {deleteCard(evt)});
+formConfirm.addEventListener('submit', (evt) => {deleteCard(evt, currentButton, currentCardId)});
 
 function submitAddCardForm(evt) {
 
@@ -120,9 +111,10 @@ function submitAddCardForm(evt) {
 
   requestAPI.addCard({name: inputNameNewCard.value, link: inputLinkNewCard.value})
   .then((res)=>{
-    templateContainer.prepend(createCard(res, res.owner._id, clickCard, likeCard));
+    templateContainer.prepend(createCard(res, res.owner._id, clickCard, likeCard, activeDeleteButton));
     closePopup(popupNewCard);
     formNewCard.reset();
+    clearValidation(formNewCard, validationConfig);
   })
   .catch((err) => { 
     console.log(err);
@@ -144,6 +136,7 @@ function submitProfileForm(evt) {
     setProfile(res.name, res.about, res.avatar);
     closePopup(popupEditProfile);
     formEditProfile.reset();
+    clearValidation(formEditProfile, validationConfig);
   })
   .catch((err) => {
     console.log(err);
@@ -164,6 +157,7 @@ function submitAvatarForm(evt) {
     setProfile(res.name, res.about, res.avatar);
     closePopup(popupEditAvatar);
     formEditAvatar.reset();
+    clearValidation(formEditAvatar, validationConfig);
   })
   .catch((err) => {
     console.log(err);
@@ -194,6 +188,19 @@ popups.forEach((popup) => {
 
 });
 
+
+let currentButton;
+let currentCardId;
+
+function activeDeleteButton(deleteButton, cardId) {
+  deleteButton.style.display = ('block')
+  deleteButton.addEventListener('click', () => {
+    toggleConfirmPopup(true);
+    currentCardId = cardId;
+    currentButton = deleteButton;
+  });
+};
+
 // Validation
 
 enableValidation(validationConfig);
@@ -204,7 +211,7 @@ Promise.all([requestAPI.getProfile(), requestAPI.getCards()])
 .then(([user, cards]) => {
   setProfile(user.name, user.about, user.avatar);
   cards.forEach(async (card) => {
-    templateContainer.append(createCard(card, user['_id'], clickCard, likeCard));
+    templateContainer.append(createCard(card, user['_id'], clickCard, likeCard, activeDeleteButton));
   })
 })
 .catch((err) => {

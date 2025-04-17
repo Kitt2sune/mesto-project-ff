@@ -2,13 +2,10 @@
 import { requestAPI } from "./api";
 import { toggleConfirmPopup } from "../scripts";
 
-let currentButton;
-let currentCardId;
 
-function createCard(card = {}, userId, clickCard, likeCard) {
+function createCard(card = {}, userId, clickCard, likeCard, activeDeleteButton) {
   
-  const template = document.querySelector('#card-template').content;
-  const copyTemplate = template.querySelector('.places__item').cloneNode(true); 
+  const copyTemplate = getCardTemplate(); 
   const image = copyTemplate.querySelector('.card__image');
   const likeButton = copyTemplate.querySelector('.card__like-block_button');
   const counter = copyTemplate.querySelector('.card__like-block_counter');
@@ -35,6 +32,13 @@ function createCard(card = {}, userId, clickCard, likeCard) {
   likeButton.addEventListener('click', () => {likeCard(likeButton, counter, card._id)});
  
   return copyTemplate;
+
+};
+
+function getCardTemplate () {
+
+  const template = document.querySelector('#card-template').content;
+  return template.querySelector('.places__item').cloneNode(true); 
 
 };
 
@@ -66,7 +70,7 @@ function likeCard(likeButton, counter, cardId) {
 
 // Функция удаления карточки
 
-function deleteCard(evt) {
+function deleteCard(evt, currentButton, currentCardId) {
   
   evt.preventDefault();
 
@@ -79,13 +83,6 @@ function deleteCard(evt) {
 
 };
 
-function activeDeleteButton(deleteButton, cardId) {
-  deleteButton.style.display = ('block')
-  deleteButton.addEventListener('click', () => {
-    toggleConfirmPopup(true);
-    currentCardId = cardId;
-    currentButton = deleteButton;
-  });
-};
+
 
 export {createCard, likeCard, deleteCard};
