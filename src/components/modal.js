@@ -28,7 +28,9 @@ function mousedownPopup (evt, popup) {
 function escapePopup (evt) {
 
   if (evt.key === 'Escape') {
-    closePopup(document.querySelector('.popup_is-opened')); 
+    if (document.querySelector('.popup_is-opened')){
+      closePopup(document.querySelector('.popup_is-opened')); 
+    }
   }
 
 }
